@@ -14,11 +14,19 @@ import java.util.ArrayList;
 @CrossOrigin(origins = "http://localhost:3000") // Allow React to access this (Handles CORS issues)
 public class DeviceController {
 
+    private final DeviceRepository deviceRepository; // Repository to interact with the database
+
+    public DeviceController(DeviceRepository deviceRepository) {
+        this.deviceRepository = deviceRepository; // Spring will automatically inject the repository instance
+    }
+
     @GetMapping("/devices") // Maps GET requests to /api/devices to this method
     public List<NetworkDevice> getDevices() {
-        // Return a dummy list for today to test the server
-        List<NetworkDevice> devices = new ArrayList<>(); 
-        devices.add(new NetworkDevice(1L, "Switch-01", "Optical Switch", "Active"));// works because lombok @AllArgsConstructor creates a constructor with all args
-        return devices; // List of devices will be automatically converted to JSON by Spring Boot (thanks to @RestController)
+        return deviceRepository.findAll(); // List of devices will be automatically converted to JSON by Spring Boot (thanks to @RestController)
+    }
+
+    @PostMapping("/devices") // Maps POST requests to /api/devices to this method
+    public NetworkDevice addDevice(@RequestBody NetworkDevice device) {
+        return deviceRepository.save(device); // Save the new device to the database and return the saved entity (with ID)
     }
 }
