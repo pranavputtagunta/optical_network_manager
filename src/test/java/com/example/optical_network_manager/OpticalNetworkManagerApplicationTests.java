@@ -15,6 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc // tells spring to set up a fake browser environment
 class OpticalNetworkManagerApplicationTests {
 
+    @Autowired
     private MockMvc mockMvc;
 
 	@Test
@@ -35,4 +36,13 @@ class OpticalNetworkManagerApplicationTests {
             // .andExpect(jsonPath("$[0].name").value("Switch-01"));
     }
 
+    @Test
+    void shouldCreateDevice() throws Exception{
+        String newDeviceJson = "{\"name\":\"Test-Switch\",\"type\":\"ROADM\",\"status\":\"Active\"}";
+
+        mockMvc.perform(post("/api/devices")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(newDeviceJson))
+            .andExpect(status().isOk());
+    }
 }

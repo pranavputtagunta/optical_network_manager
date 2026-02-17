@@ -2,8 +2,6 @@ package com.example.optical_network_manager;
 
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import java.util.ArrayList;
-
 /**
  * Controller to handle API requests related to Network Devices
  * Like FastAPI/Express router, but with more annotations and boilerplate
