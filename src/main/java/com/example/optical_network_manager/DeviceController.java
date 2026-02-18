@@ -9,22 +9,27 @@ import java.util.List;
 
 @RestController // Tells Spring this class will handle HTTP requests and return JSON responses
 @RequestMapping("/api") // Base path for all endpoints in this controller (e.g., /api/devices)
-@CrossOrigin(origins = "http://localhost:3000") // Allow React to access this (Handles CORS issues)
+// @CrossOrigin(origins = "http://localhost:3000") // Allow React to access this (Handles CORS issues)
 public class DeviceController {
 
-    private final DeviceRepository deviceRepository; // Repository to interact with the database
+    private final DeviceService deviceService; // Service to handle business logic
 
-    public DeviceController(DeviceRepository deviceRepository) {
-        this.deviceRepository = deviceRepository; // Spring will automatically inject the repository instance
+    public DeviceController(DeviceService deviceService) {
+        this.deviceService = deviceService; // Spring will automatically inject the service instance
     }
 
     @GetMapping("/devices") // Maps GET requests to /api/devices to this method
     public List<NetworkDevice> getDevices() {
-        return deviceRepository.findAll(); // List of devices will be automatically converted to JSON by Spring Boot (thanks to @RestController)
+        return deviceService.getAllDevices(); // Call the service method to fetch all devices
     }
 
     @PostMapping("/devices") // Maps POST requests to /api/devices to this method
     public NetworkDevice addDevice(@RequestBody NetworkDevice device) {
-        return deviceRepository.save(device); // Save the new device to the database and return the saved entity (with ID)
+        return deviceService.addDevice(device); // Call the service method to add a new device
+    }
+
+    @DeleteMapping("/devices/{id}") // Maps DELETE requests to /api/devices/{id} to this method
+    public void deleteDevice(@PathVariable Long id) {
+        deviceService.deleteDevice(id); // Call the service method to delete a device by ID
     }
 }

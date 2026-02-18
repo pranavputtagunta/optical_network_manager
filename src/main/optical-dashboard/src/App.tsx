@@ -7,6 +7,7 @@ function App() {
 
   const [name, setName] = useState("");
   const [type, setType] = useState("");
+  const [status, setStatus] = useState("");
 
   useEffect(() => {
     fetch("http://localhost:8080/api/devices")
@@ -17,18 +18,29 @@ function App() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault(); // Prevent form from refreshing the page
-    const newDevice = { name, type }; // Create a new device object
+    const newDevice = { name, type, status }; // Create a new device object
     fetch("http://localhost:8080/api/devices", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(newDevice), // Send the new device as JSON
-    }).then(() => {
-      window.location.reload();
-    });
+    })
+      .then((response) => response.json())
+      .then((savedDevice: NetworkDevice) => {
+        setDevices([...devices, savedDevice]); // Add the saved device (with ID) to the state
+      });
   };
 
+  const handleDelete = (id: number) => {
+    fetch(`http://localhost:8080/api/devices/${id}`, {
+      method: "DELETE",
+    })
+      .then(() => {
+        setDevices((devices) => devices.filter((device) => device.id !== id)); // Remove the deleted device from the state
+      })
+      .catch((error) => console.error("Error deleting device:", error));
+  };
   return (
     <div style={{ padding: "50px" }}>
       <form onSubmit={handleSubmit}>
@@ -45,6 +57,13 @@ function App() {
           value={type}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setType(e.target.value)
+          }
+        />
+        <input
+          placeholder="Status"
+          value={status}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setStatus(e.target.value)
           }
         />
         <button type="submit">Add Node</button>
@@ -65,6 +84,9 @@ function App() {
               <td>{device.type}</td>
               {/* TS ensures device.status exists! */}
               <td>{device.status}</td>
+              <td>
+                <button onClick={() => handleDelete(device.id)}>Delete</button>
+              </td>
             </tr>
           ))}
         </tbody>
